@@ -24,15 +24,15 @@ Um fluxo na rede $G$ é uma função $f: V \times V \rightarrow \mathbb{R}$ que 
 
 1. **Restrições de capacidade**: O fluxo em qualquer aresta não pode exceder sua capacidade. 
 
-   $$\forall (u,v) \in V, 0 \le f(u,v) \le c(u,v)$$
+   $$\forall_{u,v \in V}, 0 \le f(u,v) \le c(u,v)$$
 
 2. **Antissimetria**: O fluxo de $u$ para $v$ deve ser o oposto do fluxo de $v$ para $u$.
 
-   $$\forall (u,v) \in V, f(u,v) = -f(v,u)$$
+   $$\forall_{u,v \in V}, f(u,v) = -f(v,u)$$
 
 3. **Conservação de fluxo**: Para qualquer vértice $v$ que não seja a fonte $s$ ou o sumidouro $t$, o fluxo total que entra deve ser igual ao fluxo total que sai.
 
-   $$\forall v \in V - \{s,t\}, \sum_{u \in V} f(u, v) = 0$$
+   $$\forall_{v \in V - \{s,t\}}, \sum_{u \in V} f(u, v) = 0$$
 
 O **valor do fluxo**, denotado por $|f|$, é o fluxo líquido total que sai da fonte $s$, calculado como $|f| = \sum_{v \in V} f(s, v)$. O **problema do fluxo máximo** consiste em encontrar um fluxo $f$ que maximize o valor $|f|$.
 
@@ -61,7 +61,7 @@ Um **caminho aumentante** é definido como um caminho simples da fonte $s$ até 
 
 A existência de um caminho aumentante significa que é possível enviar mais fluxo de $s$ para $t$. A quantidade de fluxo adicional que pode ser enviada ao longo deste caminho $p$ é limitada pela aresta com a menor capacidade residual no caminho. Esta é conhecida como a **capacidade do caminho** (gargalo).
 
-   $$c_f(p) = \min \{ c_f(u, v) \mid (u, v) \text{ pertence a } p \}$$
+   $$c_f(p) = \min \{ c_f(u, v) \mid (u, v) \in p \}$$
 
 Na imagem abaixo temos um grafo residual, nele é destacado por setas azuis um caminho aumentante. A capacidade do caminho, isto é a menor capacidade residual no caminho, é 3 (na aresta $u \rightarrow v$).
 
@@ -121,9 +121,80 @@ O algoritmo continua iterativamente procurando por caminhos aumentantes no grafo
 
 # O método de Ford-Fulkerson
 
+Este método utiliza a estratégia de caminhos aumentantes. Foi proposto no artigo seminal de 1956, "Maximal Flow throught a Network", o método foi originalmente formulado para resolver problemas prátivos, como a otimização de redes ferroviárias.
+
 ## Descrição
 
-## Código
+O Ford-Fulkerson (FF) é descrito como uma abordagem "gulosa". O método geral é o seguinte:
+
+1. Inicialize o fluxo $f(u, v) = 0$ para todas as arestas $(u, v)$. O fluxo máximo $|f_{max}|$ é 0.
+
+2. Construa o grafo residual $G_f$ (inicialmente, $G_f$ é igual a $G$).
+
+3. Enquanto houver um caminho aumentante $p$ de $s$ para $t$ no grafo residual $G_f$:
+   - Encontre a capacidade residual do caminho:
+   $$c_f(p) = \min \{ c_f(u, v) \mid (u, v) \in p \}$$
+
+   - Aumente o fluxo total:
+   $$|f_{max}| = |f_{max}| + c_f(p)$$
+
+   - Para cada aresta $(u, v)$ em $p$, atualize o fluxo $f$ em $G$ e as capacidades em $G_f$:
+     - Aumenta o fluxo: $f(u, v) = f(u, v) + c_f(p)$.
+     - Antissimetria: $f(v, u) = f(v, u) - c_f(p)$.
+     - Atualize $G_f$: $c_f(u, v) = c_f(u, v) - c_f(p)$ e $c_f(v, u) = c_f(v, u) + c_f(p)$.
+
+4. Retorne $|f_{max}|$.
+
+O passo 3 é a fonte da indeterminação do método. Uma implementação que poderia se usada é a Busca em Profundidade (DFS) para encontrar um caminho. No entanto, esta escolha arbitrária pode levar a um desempenho extremamente ruim.
+
+## Pseudocódigo
+
+``` pseudocódigo
+Algoritmo Método_Ford-Fulkerson(Grafo G, Fonte s, Sumidouro t)
+    // 1. Inicialização
+    Para cada aresta (u, v) em G.arestas:
+        f(u, v) = 0           // Fluxo inicial é 0
+        f(v, u) = 0           // Fluxo reverso também é 0
+
+    // 2. Construção inicial do Grafo Residual Gf
+    // Gf tem os mesmos nós de G. As arestas de Gf terão a capacidade residual.
+    Gf = cópia de G
+    Para cada aresta (u, v) em G.arestas:
+        cf(u, v) = c(u, v)    // Capacidade residual inicial é a capacidade original
+        cf(v, u) = 0          // Capacidade residual reversa é 0
+
+    f_max = 0                 // Valor do fluxo máximo inicial
+
+    // 3. Loop Principal
+    // Tenta encontrar um caminho aumentante 'p' de 's' a 't' no grafo residual 'Gf'
+    // O algoritmo exato para encontrar o caminho não é especificado aqui (pode ser DFS, BFS, etc.)
+    Enquanto (existir um caminho p de s para t em Gf):
+
+        // 3a. Encontra a capacidade de gargalo do caminho p
+        capacidade_gargalo = INFINITO
+        Para cada aresta (u, v) no caminho p:
+            capacidade_gargalo = min(capacidade_gargalo, cf(u, v))
+
+        // 3b. Aumenta o valor do fluxo total
+        f_max = f_max + capacidade_gargalo
+
+        // 3c. Atualiza os fluxos e o grafo residual
+        Para cada aresta (u, v) no caminho p:
+            // Aumenta o fluxo na direção do caminho
+            f(u, v) = f(u, v) + capacidade_gargalo
+            // Diminui o fluxo na direção oposta (antissimetria)
+            f(v, u) = f(v, u) - capacidade_gargalo
+
+            // Atualiza as capacidades residuais em Gf
+            // A capacidade residual na direção do fluxo diminui
+            cf(u, v) = cf(u, v) - capacidade_gargalo
+            // A capacidade residual na direção reversa aumenta
+            cf(v, u) = cf(v, u) + capacidade_gargalo
+
+    // 4. Retorno
+    Retorne f_max
+Fim Algoritmo
+```
 
 ### Análise de complexidade
 
