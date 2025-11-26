@@ -480,6 +480,32 @@ Resultado Final:
 
 # Comparações
 
+Há algumas comparações que podem ser feitas, as diferenças serão colocadas na tabela abaixo:
+
+| Característica | Método Ford-Fulkerson | Algoritmo Edmonds-Karp |
+| -------------- | --------------------- | ---------------------- |
+| Estratégia de Busca | DFS | Busca em Largura |
+| Caminho encontrado | Qualquer caminho aumentante simples | Caminho aumentante mais curto (em nº de aresta) |
+| Complexidade de tempo | $O(E \cdot f)$ | $f^*$ |
+| Tipo de complexidade | Pseudo-polinomial | Fortemente polinomial |
+| Dependências | Depende do valor das capacidades | Independente do valor das capacidades |
+
+# Aplicação
+
+Uma das aplicações do fluxo máximo é a resolução do problema de **emparelhamento máximo em grafos bipartidos** (*Maximum Bipartite Matching*). Este é um problema comum em alocação de recursos, como atribuir tarefas a trabalhadores, médicos a hospitais, ou motoristas a passageiros.
+
+**O Problema**: Dado um grafo bipartido $G = (L \cup R, E)$, onde $L$ e $R$ são conjuntos disjuntos de vértices (ex: "Trabalhadores" e "Tarefas") e $E$ contém arestas apenas entre $L$ e $R$, encontrar o maior subconjunto de arestas $M \subseteq E$ tal que nenhum vértice esteja conectado a mais de uma aresta em $M$.
+
+**A Redução para Fluxo Máximo**: O problema pode ser resolvido da seguinte forma:
+- Crie uma nova super-fonte $s$ e um novo super-sumidouro $t$.
+- Para cada vértice $l \in L$, adicione uma aresta $(s, l)$ com capacidade $c(s, l) = 1$.
+- Para cada vértice $r \in R$, adicione uma aresta $(r, t)$ com capacidade $c(r, t) = 1$.
+- Para cada aresta original $(l, r)$ no grafo bipartido, adicione uma aresta direcionada $(l, r)$ com capacidade $c(l, r) = 1$ (ou infinito; 1 é suficiente).
+
+O Resultado: O Teorema da Integralidade garante que, como todas as capacidades são inteiras, o fluxo máximo $f^*$ encontrado pelo algoritmo de Ford-Fulkerson (ou Edmonds-Karp) também será inteiro. Como as capacidades de saída de $s$ e entrada em $t$ são 1, o fluxo em cada aresta $(l, r)$ será 0 ou 1.
+
+O valor do fluxo máximo $|f^*|$ nesta rede construída é exatamente igual ao tamanho do emparelhamento máximo no grafo bipartido original.
+
 # Referências
 
 ---
