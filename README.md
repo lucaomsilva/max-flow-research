@@ -167,7 +167,6 @@ Algoritmo Método_Ford-Fulkerson(Grafo G, Fonte s, Sumidouro t)
 
     // 3. Loop Principal
     // Tenta encontrar um caminho aumentante 'p' de 's' a 't' no grafo residual 'Gf'
-    // O algoritmo exato para encontrar o caminho não é especificado aqui (pode ser DFS, BFS, etc.)
     Enquanto (existir um caminho p de s para t em Gf):
 
         // 3a. Encontra a capacidade de gargalo do caminho p
@@ -274,11 +273,210 @@ Se M for um número muito grande (ex: 1 milhão), o algoritmo executará milhõe
 
 # O algoritmo de Edmonds-Karp
 
+O problema da complexidade pseudo-polinomial foi resolvido independentemente por Yefim Dinitz em 1970  e por Jack Edmonds e Richard Karp em 1972. O algoritmo de Edmonds-Karp (EK) é uma especialização do método de Ford-Fulkerson.
+
 ## Modificação
 
-## Código
+O algoritmo de Edmonds-Karp se difere do método de Ford-Fulkerson apenas no passo 3. Nele é encontrado um caminho aumentante usando DFS, para este novo método é usado um Busca em Largura (BFS).
+
+O uso do BFS garante que o caminho aumentante encontrado seja o mais curto em termos de número de arestas.
+
+## Pseudocódigo
+
+// TODO: Verificar se é necessário
+
+``` pseudocódigo
+Algoritmo Edmonds-Karp(Grafo G, Fonte s, Sumidouro t)
+    // 1. Inicialização
+    // Define o fluxo inicial f(u, v) = 0 para todas as arestas
+    // O grafo residual Gf é inicialmente idêntico ao grafo G original.
+    Inicializar f(u, v) = 0 para todas as arestas (u, v) em G
+    f_max = 0
+    
+    // 2. Loop Principal
+    // A diferença crucial: usa BFS para encontrar o caminho mais curto em arestas
+    Enquanto (BFS(Gf, s, t, caminho_pai) retorna Verdadeiro):
+        
+        // 2a. Encontra a capacidade de gargalo do caminho encontrado pelo BFS
+        capacidade_gargalo = INFINITO
+        v = t
+        Enquanto (v != s):
+            u = caminho_pai[v]
+            capacidade_gargalo = min(capacidade_gargalo, cf(u, v))
+            v = u
+        
+        // 2b. Aumenta o valor do fluxo total
+        f_max = f_max + capacidade_gargalo
+        
+        // 2c. Atualiza os fluxos e o grafo residual ao longo do caminho
+        v = t
+        Enquanto (v != s):
+            u = caminho_pai[v]
+            // Aumenta o fluxo na direção do caminho
+            f(u, v) = f(u, v) + capacidade_gargalo
+            // Diminui o fluxo na direção oposta (antissimetria)
+            f(v, u) = f(v, u) - capacidade_gargalo
+            
+            // Atualiza as capacidades residuais em Gf
+            cf(u, v) = cf(u, v) - capacidade_gargalo
+            cf(v, u) = cf(v, u) + capacidade_gargalo
+            
+            v = u
+
+    // 3. Retorno
+    Retorne f_max
+Fim Algoritmo
+
+// Função auxiliar BFS para encontrar o caminho mais curto
+Função BFS(Grafo Residual Gf, Fonte s, Sumidouro t, Mapa caminho_pai)
+    Fila q
+    q.enfileirar(s)
+    Conjunto visitados = {s}
+    caminho_pai[s] = NULO
+    
+    Enquanto (q não está vazia):
+        u = q.desenfileirar()
+        Para cada vizinho v de u em Gf:
+            // Verifica se o nó não foi visitado e se há capacidade residual
+            Se (v não está em visitados E cf(u, v) > 0):
+                q.enfileirar(v)
+                visitados.adicionar(v)
+                caminho_pai[v] = u  // Armazena o pai para reconstruir o caminho
+                Se (v == t):
+                    Retorne Verdadeiro // Caminho encontrado
+    
+    Retorne Falso // Nenhum caminho encontrado
+Fim Função
+```
 
 ### Análise de complexidade
+
+A contribuição teórica de Edmonds e Karp foi provar que, ao escolher o caminho mais curto, o tempo de execução se torna fortemente polinomial, ou seja, independente do valor das capacidades. A complexidade total do algoritmo de Edmonds-Karp é $O(V \cdot E^2)$.
+
+Essa complexidade é derivada da combinação de dois lemas:
+
+1. **Tempo por iteração**: Cada busca por BFS para encontrar o caminho mais curto leva $O(E)$ tempo.
+
+2. **Número de iterações**: O número total de caminhos aumentantes é, no máximo, $O(V \cdot E)$.
+   - A distância do caminho mais curto da fonte $s$ para qualquer outro vértice $v$ no grafo residual, $d(s, v)$, é monotonicamente não decrescente, ou seja, nunca diminui ao longo das iterações de aumento de fluxo.
+
+   - Cada aresta $(u, v)$ pode se tornar o gargalo no máximo $O(V)$ vezes durante toda a execução do algoritmo. Como existem $O(E)$ arestas no total, o número total de eventos de saturação (e, portanto, de augmentações) é limitado por $O(V \cdot E)$.
+
+Este resultado é significativamente melhor que o de Ford-Fulkerson, pois depende apenas da estrutura do grafo (V e E) e não dos valores das capacidades. O algoritmo de Edmonds-Karp tem garantia de término mesmo para capacidades irracionais.
+
+#### Exemplo
+
+Vamos usar uma rede pequena com 4 nós:
+
+- s: Fonte
+- t: Sumidouro
+- A, B: Nós intermediários
+- Os números nas setas indicam a Capacidade inicial da aresta. O fluxo inicial é 0.
+
+``` mermaid
+graph LR
+    s((s)) --10--> A((A))
+
+    s --10--> B((B))
+    A --8--> t((t))
+    B --8--> t
+
+    A --5--> B
+```
+
+Estado Inicial:
+- Fluxo Máximo Total: 0
+- O Grafo Residual ($G_f$) é idêntico ao grafo original acima, pois não há fluxo.
+
+Para a primera iteração:
+1. Encontrar Caminho (BFS): Executamos uma BFS no grafo residual a partir de s para encontrar o caminho mais curto até t.
+   - O BFS encontra dois caminhos de comprimento 2: 
+
+      $s → A → t$ e $s → B → t$
+
+   - Vamos escolher: Caminho $p_1$: s → A → t.
+   
+2. Calcular Gargalo: Verificamos as capacidades residuais nesse caminho:
+   - $c_f(s, A) = 10$
+   - $c_f(A, t) = 8$
+   - O gargalo é o mínimo: $c_f(p_1) = 8$.
+
+3. Aumentar Fluxo: Adicionamos 8 ao fluxo total.
+   - Novo Fluxo Máximo Total: 8.
+
+4. Atualizar Grafo Residual ($G_f$):
+   - Aresta s → A: Capacidade residual diminui ($10 - 8 = 2$). Adicionamos aresta reversa A → s com capacidade 8.
+   - Aresta A → t: Capacidade residual diminui ($8 - 8 = 0$). Esta aresta fica saturada e "desaparece" do residual. Adicionamos aresta reversa t → A com capacidade 8.
+
+```mermaid
+graph LR
+    s((s)) --8/10--> A((A))
+    s --0/10--> B((B))
+    A --0/5--> B
+    B --0/8--> t((t))
+    A --8/8--> t
+    
+    classDef path fill:#f9f,stroke:#333,stroke-width:2px;
+    linkStyle 0,4 stroke:blue,stroke-width:2px,fill:none;
+```
+
+Para a segunda iteração:
+
+1. Encontrar Caminho (BFS): Executamos o BFS novamente no grafo residual atualizado.
+   - Como A → t não existe mais no residual, o caminho anterior não está disponível.
+   - O BFS encontra o próximo caminho mais curto: Caminho $p_2$: s → B → t.
+   
+2. Calcular Gargalo: Verificamos as capacidades residuais nesse caminho:
+   - $c_f(s, B) = 10$
+   - $c_f(B, t) = 8$
+   - O gargalo é o mínimo: $c_f(p_2) = 8$.
+
+3. Aumentar Fluxo: Adicionamos 8 ao fluxo total.
+   - Novo Fluxo Máximo Total: 8 + 8 = 16.
+
+4. Atualizar Grafo Residual ($G_f$):
+   - Aresta s → B: Capacidade residual diminui ($10 - 8 = 2$). Adicionamos aresta reversa B → s com capacidade 8.
+   - Aresta B → t: Capacidade residual diminui ($8 - 8 = 0$). Esta aresta também fica saturada. Adicionamos aresta reversa t → B com capacidade 8.
+
+```mermaid
+graph LR
+    s((s)) --8/10--> A((A))
+    s --8/10--> B((B))
+    A --0/5--> B
+    B --8/8--> t((t))
+    A --8/8--> t
+    
+    classDef path fill:#f9f,stroke:#333,stroke-width:2px;
+    linkStyle 1,3 stroke:blue,stroke-width:2px,fill:none;
+```
+
+Para a terceira iteração:
+
+1. Encontrar Caminho (BFS): Executamos o BFS novamente.
+   - Podemos ir de s para A (capacidade restante 2).
+   - Podemos ir de s para B (capacidade restante 2).
+   - De A, podemos ir para B (capacidade 5) ou voltar para s.
+   - De B, podemos voltar para s.
+   - Não há mais arestas com capacidade positiva que cheguem ao nó t.
+   
+2. Conclusão: O BFS não encontra nenhum caminho de s para t. O algoritmo termina.
+
+```mermaid
+graph LR
+    s((s)) --"8/10"--> A((A))
+    s --"8/10"--> B((B))
+    A --"8/8"--> t((t))
+    B --"8/8"--> t
+    A --"0/5"--> B
+    
+    style A stroke:red,stroke-width:2px
+    style B stroke:red,stroke-width:2px
+    style t stroke:red,stroke-width:2px
+    linkStyle 2,3 stroke:red,stroke-width:4px,fill:none;
+```
+
+Resultado Final:
+- O algoritmo de Edmonds-Karp encontrou um Fluxo Máximo de 16.
 
 # Comparações
 
