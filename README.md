@@ -198,7 +198,79 @@ Fim Algoritmo
 
 ### Análise de complexidade
 
+Cada iteração do loop (encontrar um caminho) leva tempo proporcional ao número de arestas, ou seja, $O(E)$.
+
+No entanto, o número de iterações depende crucialmente da escolha do caminho. Se as capacidades forem valores inteiros, o pior cenário ocorre quando o fluxo aumenta em apenas 1 unidade a cada iteração. Se o fluxo máximo tiver um valor $|f^*|$, o número de iterações pode ser da ordem de $|f^*|$.
+
+Portanto, a complexidade de tempo do método Ford-Fulkerson é $O(E \cdot |f^*|)$.
+
 ### Complexidade de tempo pseudo-polinomial
+
+Este tempo de execução não é polinomial. Um algoritmo é considerado polinomial se seu tempo de execução é um polinômio no tamanho da entrada (em bits). O tamanho da entrada do grafo é $O(V + E)$ mais o espaço para armazenar as capacidades, que é $O(E \log c_{max})$.O tempo $O(E \cdot |f^*|)$ é chamado de pseudo-polinomial. Ele é polinomial no valor numérico $|f^*|$, mas não no tamanho em bits (ou seja, $\log |f^*|$) da entrada.
+
+Isso tem implicações práticas severas: se um grafo tiver capacidades muito grandes (ex: $10^9$), o algoritmo pode ser impraticavelmente lento, mesmo que o grafo em si (V e E) seja pequeno. O caso ainda pode ser pior, se as capacidades forem números irracionais, o método FF genérico pode executar um número infinito de iterações e nunca convergir para o fluxo máximo.
+
+#### Exemplo pior caso
+
+O grafo abaixo possui 4 vértices: uma fonte s, um sumidouro t, e dois vértices intermediários u e v. As arestas possuem as seguintes capacidades:
+
+- As arestas $(s \rightarrow u, s \rightarrow v, u \rightarrow t, v \rightarrow t)$ possuem uma capacidade muito grande, denotada por M.
+
+- A aresta central $(u \rightarrow v)$ atua como uma "ponte" com uma capacidade muito pequena, igual a 1.
+
+```mermaid
+graph LR
+    s(("s")) -- M --> u(("u")) & v(("v"))
+    
+    u -- M --> t(("t"))
+    v -- M --> t
+
+    u -- 1 --> v
+```
+
+Se o algoritmo for implementado de forma a escolher, alternadamente, os seguintes caminhos:
+
+1. **Caminho 1**: $s \rightarrow u \rightarrow v \rightarrow t$
+
+   - A capacidade de gargalo deste caminho é 1 (limitada pela aresta $u \rightarrow v$).
+
+   - O fluxo total aumenta em 1.
+
+   - No grafo residual, a aresta $u \rightarrow v$ fica saturada, e uma aresta reversa $v \rightarrow u$ com capacidade 1 é criada.
+
+```mermaid
+graph LR
+    s(("s")) -- 1/M --> u(("u"))
+    s -- M --> v(("v"))
+    
+    u -- M --> t(("t"))
+    v -- 1/M --> t
+
+    v -- 1 --> u
+```
+
+2. **Caminho 2**: $s \rightarrow v \rightarrow u \rightarrow t$
+
+   - Este caminho utiliza a aresta reversa $v \rightarrow u$ criada na iteração anterior.
+
+   - A capacidade de gargalo é novamente 1.
+
+   - O fluxo total aumenta em mais 1.
+
+   - O fluxo na aresta $u \rightarrow v$ é efetivamente "cancelado", e o sistema retorna a um estado semelhante ao inicial nas arestas de grande capacidade.
+
+```mermaid
+graph LR
+    s(("s")) -- 1/M --> u(("u")) & v(("v"))
+    
+    u -- 1/M --> t(("t"))
+    v -- 1/M --> t
+
+    u -- 1 --> v
+```
+Este padrão de alternância entre os dois caminhos que utilizam a aresta central pode se repetir 2M vezes. Como cada iteração aumenta o fluxo em apenas 1 unidade, e o fluxo máximo possível é 2M, o algoritmo realizará um número de operações proporcional ao valor de M.
+
+Se M for um número muito grande (ex: 1 milhão), o algoritmo executará milhões de iterações, tornando-se extremamente ineficiente, mesmo para um grafo com apenas 4 vértices. Isso demonstra que a complexidade do método genérico de Ford-Fulkerson é $O(E \cdot f^*)$, onde $f^*$ é o valor do fluxo máximo, caracterizando-o como um algoritmo pseudo-polinomial.
 
 # O algoritmo de Edmonds-Karp
 
