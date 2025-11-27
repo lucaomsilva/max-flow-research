@@ -486,7 +486,7 @@ Há algumas comparações que podem ser feitas, as diferenças serão colocadas 
 | -------------- | --------------------- | ---------------------- |
 | Estratégia de Busca | DFS | Busca em Largura |
 | Caminho encontrado | Qualquer caminho aumentante simples | Caminho aumentante mais curto (em nº de aresta) |
-| Complexidade de tempo | $O(E \cdot f)$ | $f^*$ |
+| Complexidade de tempo | $O(E \cdot f)$ | $O(V \cdot E^2)$ |
 | Tipo de complexidade | Pseudo-polinomial | Fortemente polinomial |
 | Dependências | Depende do valor das capacidades | Independente do valor das capacidades |
 
@@ -506,7 +506,27 @@ O Resultado: O Teorema da Integralidade garante que, como todas as capacidades s
 
 O valor do fluxo máximo $|f^*|$ nesta rede construída é exatamente igual ao tamanho do emparelhamento máximo no grafo bipartido original.
 
+## Mais aplicações
+
+- **Roteamento em Redes**: Calcular a taxa máxima de transferência de dados entre dois pontos em uma rede de computadores.
+
+- **Segmentação de Imagem**: Na visão computacional, o Min-Cut (e, portanto, Max-Flow) é usado para segmentar imagens, separando eficientemente o objeto de interesse do fundo.
+
+- **Conectividade de Rede (Min-Cut)**: Pelo Teorema Max-Flow Min-Cut, o fluxo máximo é igual ao corte mínimo. Isso é usado para encontrar o número mínimo de arestas (ou cabos) que precisam ser cortados para desconectar dois pontos na rede ("Police Chase").
+
+- **Problema de Eliminação**: Determinar se um time ainda tem chance matemática de vencer a temporada, dados os jogos restantes.
+
 # Referências
 
+* [1] FORD, L. R.; FULKERSON, D. R. **Maximal Flow Through a Network**. Canadian Journal of Mathematics, v. 8, p. 399-404, 1956. Disponível em: <https://www.cambridge.org/core/services/aop-cambridge-core/content/view/5D6E55D3B06C4F7B1043BC1D82D40764/S0008414X00036890a.pdf/maximal-flow-through-a-network.pdf>.
+* [2] CHEN, Z.; YE, Y.; HAN, J. **A Parallel Edmonds-Karp Algorithm for Maximum Flow Problem on GPGPU**. In: INTERNATIONAL CONFERENCE ON PARALLEL AND DISTRIBUTED PROCESSING TECHNIQUES AND APPLICATIONS (PDPTA'13), 2013, Las Vegas. Proceedings... Las Vegas: CSREA Press, 2013. p. 373-379. Disponível em: <https://worldcomp-proceedings.com/proc/p2013/PDP3767.pdf>.
+* [3] RESUMOS LEIC. **Fluxos Máximos**. Disponível em: <https://resumos.leic.pt/asa/fluxos-maximos/>.
+* [4] MALBARBO, P. **Fluxo Máximo**. Disponível em: <https://malbarbo.pro.br/arquivos/2022/6898/10-fluxo-maximo.pdf>.
+* [5] PEREIRA, F. **Algoritmo de Ford-Fulkerson para Fluxo Máximo**. 2020. 1 vídeo (13 min). Publicado pelo canal Fernando Pereira. Disponível em: <https://www.youtube.com/watch?v=Zx7Qr9WuIs8>.
+* [6] FEOFILOFF, P. **Fluxo Máximo**. Disponível em: <https://www.ime.usp.br/~pf/otimizacao-combinatoria/aulas/max-flow.html#sec:flowbasics>.
+* [7] IWATA, S.; KAMEYAMA, T. **A Fast Algorithm for the Maximum Flow Problem on Directed Acyclic Graphs**. Journal of the Operations Research Society of Japan, v. 47, n. 4, p. 258-267, 2004. Disponível em: <https://www.jstage.jst.go.jp/article/jorsj/47/4/47_KJ00002424949/_pdf/-char/en>.
+* [8] GEEKSFORGEEKS. **Ford-Fulkerson Algorithm for Maximum Flow Problem**. Disponível em: <https://www.geeksforgeeks.org/dsa/ford-fulkerson-algorithm-for-maximum-flow-problem/>.
+* [9] CP-ALGORITHMS. **Edmonds-Karp Algorithm**. Disponível em: <https://cp-algorithms.com/graph/edmonds_karp.html>.
+
 ---
-\* **sumidouro (sink)** será tratado como destino.
+\* **sumidouro (*sink*)** será tratado como destino.
