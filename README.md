@@ -484,9 +484,9 @@ Há algumas comparações que podem ser feitas, as diferenças serão colocadas 
 
 | Característica | Método Ford-Fulkerson | Algoritmo Edmonds-Karp |
 | -------------- | --------------------- | ---------------------- |
-| Estratégia de Busca | DFS | Busca em Largura |
+| Estratégia de Busca | Busca em Profundidade (DFS) | Busca em Largura (BFS) |
 | Caminho encontrado | Qualquer caminho aumentante simples | Caminho aumentante mais curto (em nº de aresta) |
-| Complexidade de tempo | $O(E \cdot f)$ | $O(V \cdot E^2)$ |
+| Complexidade de tempo | $O(E \cdot \|f^*\|)$ | $O(V \cdot E^2)$ |
 | Tipo de complexidade | Pseudo-polinomial | Fortemente polinomial |
 | Dependências | Depende do valor das capacidades | Independente do valor das capacidades |
 
