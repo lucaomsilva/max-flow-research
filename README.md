@@ -121,7 +121,7 @@ O algoritmo continua iterativamente procurando por caminhos aumentantes no grafo
 
 # O método de Ford-Fulkerson
 
-Este método utiliza a estratégia de caminhos aumentantes. Foi proposto no artigo seminal de 1956, "Maximal Flow throught a Network", o método foi originalmente formulado para resolver problemas prátivos, como a otimização de redes ferroviárias.
+Este método utiliza a estratégia de caminhos aumentantes. Foi proposto no artigo seminal de 1956, "Maximal Flow throught a Network", o método foi originalmente formulado para resolver problemas práticos, como a otimização de redes ferroviárias.
 
 ## Descrição
 
@@ -522,7 +522,7 @@ O valor do fluxo máximo $|f^*|$ nesta rede construída é exatamente igual ao t
 * [2] CHEN, Z.; YE, Y.; HAN, J. **A Parallel Edmonds-Karp Algorithm for Maximum Flow Problem on GPGPU**. In: INTERNATIONAL CONFERENCE ON PARALLEL AND DISTRIBUTED PROCESSING TECHNIQUES AND APPLICATIONS (PDPTA'13), 2013, Las Vegas. Proceedings... Las Vegas: CSREA Press, 2013. p. 373-379. Disponível em: <https://worldcomp-proceedings.com/proc/p2013/PDP3767.pdf>.
 * [3] RESUMOS LEIC. **Fluxos Máximos**. Disponível em: <https://resumos.leic.pt/asa/fluxos-maximos/>.
 * [4] MALBARBO, P. **Fluxo Máximo**. Disponível em: <https://malbarbo.pro.br/arquivos/2022/6898/10-fluxo-maximo.pdf>.
-* [5] PEREIRA, F. **Algoritmo de Ford-Fulkerson para Fluxo Máximo**. 2020. 1 vídeo (13 min). Publicado pelo canal Fernando Pereira. Disponível em: <https://www.youtube.com/watch?v=Zx7Qr9WuIs8>.
+* [5] PEREIRA, F. **Algoritmo de Ford-Fulkerson para Fluxo Máximo**. 2020. 1 vídeo. Publicado pelo canal Fernando Pereira. Disponível em: <https://www.youtube.com/watch?v=Zx7Qr9WuIs8>.
 * [6] FEOFILOFF, P. **Fluxo Máximo**. Disponível em: <https://www.ime.usp.br/~pf/otimizacao-combinatoria/aulas/max-flow.html#sec:flowbasics>.
 * [7] IWATA, S.; KAMEYAMA, T. **A Fast Algorithm for the Maximum Flow Problem on Directed Acyclic Graphs**. Journal of the Operations Research Society of Japan, v. 47, n. 4, p. 258-267, 2004. Disponível em: <https://www.jstage.jst.go.jp/article/jorsj/47/4/47_KJ00002424949/_pdf/-char/en>.
 * [8] GEEKSFORGEEKS. **Ford-Fulkerson Algorithm for Maximum Flow Problem**. Disponível em: <https://www.geeksforgeeks.org/dsa/ford-fulkerson-algorithm-for-maximum-flow-problem/>.
@@ -530,3 +530,24 @@ O valor do fluxo máximo $|f^*|$ nesta rede construída é exatamente igual ao t
 
 ---
 \* **sumidouro (*sink*)** será tratado como destino.
+
+```mermaid
+---
+config:
+  layout: fixed
+  theme: dark
+---
+flowchart LR
+    s(("0/s")) -- 16 --> n1(("1"))
+    s -- 13 --> n2(("2"))
+    n1 -- 12 --> n3(("3"))
+    s -- 4 --> n4(("4"))
+    n2 -- 14 --> n4
+    n3 -- 9 --> n2
+    n3 -- 20 --> t(("5/t"))
+    n4 -- 7 --> n3
+    n4 -- 4 --> t
+
+    style s fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+    style t fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+```
